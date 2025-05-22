@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                      // Salida ES6
+    "module": "CommonJS",                 // Usar módulos CommonJS
+    "moduleResolution": "node",           // Resolución de módulos estilo Node.js
+    "outDir": "./dist",                   // Carpeta de salida
+    "rootDir": "./src",                   // Carpeta de entrada
+    "strict": true,                       // Habilitar todas las comprobaciones estrictas
+    "esModuleInterop": true,              // Interoperabilidad entre CommonJS y ESModules
+    "skipLibCheck": true                  // Ignorar la comprobación de bibliotecas
+  },
+  "include": ["src/**/*"],                // Incluir todos los archivos en src/
+  "exclude": ["node_modules"]             // Excluir node_modules
+}
