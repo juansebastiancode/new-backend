@@ -7,6 +7,7 @@ import spotifyRoutes from './routes/spotifyRoutes';
 import SocketService from './services/socketService';
 import { spotifyService } from './services/spotifyService';
 import eventRoutes from './routes/eventRoutes';
+import stripeRoutes from './routes/stripe.routes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -18,6 +19,7 @@ app.use(express.json());
 // Rutas
 app.use('/api', spotifyRoutes);
 app.use('/api', eventRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
