@@ -8,6 +8,8 @@ import SocketService from './services/socketService';
 import { spotifyService } from './services/spotifyService';
 import eventRoutes from './routes/eventRoutes';
 import stripeRoutes from './routes/stripe.routes';
+import openaiRoutes from './routes/openaiRoutes';
+import userRoutes from './routes/userRoutes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -20,6 +22,8 @@ app.use(express.json());
 app.use('/api', spotifyRoutes);
 app.use('/api', eventRoutes);
 app.use('/api/stripe', stripeRoutes);
+app.use('/api/openai', openaiRoutes);
+app.use('/api', userRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
@@ -30,7 +34,7 @@ app.get("/", (req, res) => {
 const connectDB = async () => {
     try {
         await mongoose.connect(config.mongoUrl);
-        console.log("✅ Conexión exitosa a MongoDB a la BD de seplay");
+        console.log("✅ Conexión exitosa a MongoDB - Base de datos: Proyecto");
     } catch (error) {
         console.error("❌ Error al conectar a MongoDB:", error);
         process.exit(1);
