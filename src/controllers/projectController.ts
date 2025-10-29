@@ -5,7 +5,7 @@ import Usuario from '../models/usuariosModel';
 
 export const createProject = async (req: Request, res: Response) => {
   try {
-    const { name, sector } = req.body;
+    const { name, sector, description, type } = req.body;
     const rawUserId = req.body?.userId ?? req.body?.uid;
     const userId = typeof rawUserId === 'string' ? rawUserId : String(rawUserId || '').trim();
     if (!userId || !name) {
@@ -19,7 +19,18 @@ export const createProject = async (req: Request, res: Response) => {
       res.status(400).json({ error: 'userId no es un ObjectId válido' });
       return;
     }
-    const project = await ProjectModel.create({ userId: userObjectId, name, sector });
+    const enabledTabsDefault = [
+      'roadmap',
+      'tasks',
+      'map',
+      'events',
+      'inventory',
+      'suppliers',
+      'customers',
+      'invoices',
+      'statistics'
+    ];
+    const project = await ProjectModel.create({ userId: userObjectId, name, sector, description, type, enabledTabs: enabledTabsDefault });
     // Añadir referencia al usuario
     await Usuario.findByIdAndUpdate(userObjectId, { $addToSet: { proyectos: project._id } });
     res.status(201).json(project);
@@ -48,6 +59,44 @@ export const getProjectsByUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Error listando proyectos:', error);
     res.status(500).json({ error: 'Error al listar proyectos' });
+  }
+};
+
+export const getProjectById = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = req.params as any;
+    if (!projectId) {
+      res.status(400).json({ error: 'projectId es requerido' });
+      return;
+    }
+    const proj = await ProjectModel.findById(projectId);
+    if (!proj) {
+      res.status(404).json({ error: 'Proyecto no encontrado' });
+      return;
+    }
+    res.json(proj);
+  } catch (error: any) {
+    console.error('Error obteniendo proyecto:', error);
+    res.status(500).json({ error: 'Error al obtener proyecto' });
+  }
+};
+
+export const updateProject = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = req.params as any;
+    const { name, sector, description, type, enabledTabs } = req.body;
+    const update: any = {};
+    if (typeof name === 'string') update.name = name;
+    if (typeof sector === 'string') update.sector = sector;
+    if (typeof description === 'string') update.description = description;
+    if (typeof type === 'string') update.type = type;
+    if (Array.isArray(enabledTabs)) update.enabledTabs = enabledTabs.filter((x: any) => typeof x === 'string');
+    const proj = await ProjectModel.findByIdAndUpdate(projectId, update, { new: true });
+    if (!proj) { res.status(404).json({ error: 'Proyecto no encontrado' }); return; }
+    res.json(proj);
+  } catch (error: any) {
+    console.error('Error actualizando proyecto:', error);
+    res.status(500).json({ error: 'Error al actualizar proyecto' });
   }
 };
 
