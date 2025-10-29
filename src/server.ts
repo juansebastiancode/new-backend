@@ -10,6 +10,7 @@ import eventRoutes from './routes/eventRoutes';
 import stripeRoutes from './routes/stripe.routes';
 import openaiRoutes from './routes/openaiRoutes';
 import userRoutes from './routes/userRoutes';
+import projectRoutes from './routes/projectRoutes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -24,6 +25,7 @@ app.use('/api', eventRoutes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/api/openai', openaiRoutes);
 app.use('/api', userRoutes);
+app.use('/api', projectRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {

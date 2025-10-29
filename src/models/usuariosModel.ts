@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const usuarioSchema = new mongoose.Schema({
   nombre: { type: String, required: true }, // Nombre del usuario
@@ -9,6 +9,7 @@ const usuarioSchema = new mongoose.Schema({
   telefono: { type: String }, // Teléfono del usuario
   pais: { type: String }, // País del usuario
   ciudad: { type: String }, // Ciudad del usuario
+  proyectos: [{ type: Schema.Types.ObjectId, ref: 'Project', default: [] }], // Referencias a proyectos
 });
 
 const Usuario = mongoose.model("Usuario", usuarioSchema);
