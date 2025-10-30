@@ -100,4 +100,25 @@ export const updateProject = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteProject = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = req.params as any;
+    if (!projectId) {
+      res.status(400).json({ error: 'projectId es requerido' });
+      return;
+    }
+    const deleted = await ProjectModel.findByIdAndDelete(projectId);
+    if (!deleted) {
+      res.status(404).json({ error: 'Proyecto no encontrado' });
+      return;
+    }
+    // Opcional: Quitar referencia en usuarios
+    await Usuario.updateMany({ proyectos: projectId }, { $pull: { proyectos: projectId } });
+    res.status(204).send();
+  } catch (error: any) {
+    console.error('Error eliminando proyecto:', error);
+    res.status(500).json({ error: 'Error al eliminar proyecto' });
+  }
+};
+
 
