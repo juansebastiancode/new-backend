@@ -11,6 +11,8 @@ import stripeRoutes from './routes/stripe.routes';
 import openaiRoutes from './routes/openaiRoutes';
 import userRoutes from './routes/userRoutes';
 import projectRoutes from './routes/projectRoutes';
+import customersRoutes from './routes/customers.routes';
+import proveedoresRoutes from './routes/proveedores.routes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -26,6 +28,8 @@ app.use('/api/stripe', stripeRoutes);
 app.use('/api/openai', openaiRoutes);
 app.use('/api', userRoutes);
 app.use('/api', projectRoutes);
+app.use('/api', customersRoutes);
+app.use('/api', proveedoresRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
