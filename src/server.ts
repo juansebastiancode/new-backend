@@ -14,6 +14,8 @@ import projectRoutes from './routes/projectRoutes';
 import customersRoutes from './routes/customers.routes';
 import proveedoresRoutes from './routes/proveedores.routes';
 import inventoryRoutes from './routes/inventory.routes';
+import inventoryOrdersRoutes from './routes/inventoryOrders.routes';
+import credentialsRoutes from './routes/credentials.routes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -32,6 +34,8 @@ app.use('/api', projectRoutes);
 app.use('/api', customersRoutes);
 app.use('/api', proveedoresRoutes);
 app.use('/api', inventoryRoutes);
+app.use('/api', inventoryOrdersRoutes);
+app.use('/api', credentialsRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
