@@ -10,6 +10,7 @@ const usuarioSchema = new mongoose.Schema({
   pais: { type: String }, // País del usuario
   ciudad: { type: String }, // Ciudad del usuario
   proyectos: [{ type: Schema.Types.ObjectId, ref: 'Project', default: [] }], // Referencias a proyectos
+  proyectosInvitados: [{ type: Schema.Types.ObjectId, ref: 'Project', default: [] }], // Proyectos donde fue invitado
 });
 
 const Usuario = mongoose.model("Usuario", usuarioSchema);

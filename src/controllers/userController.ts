@@ -44,7 +44,8 @@ export const getUserByEmail = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     const user = await Usuario.findOne({ email, eliminado: false })
-      .populate('proyectos', 'name sector createdAt');
+      .populate('proyectos', 'name sector createdAt')
+      .populate('proyectosInvitados', 'name sector createdAt');
     
     if (!user) {
       res.status(404).json({ error: 'Usuario no encontrado' });

@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import mongoose from "mongoose";
 import http from "http";
 import cors from "cors";
+import path from "path";
 import { config } from './config/config';
 import spotifyRoutes from './routes/spotifyRoutes';
 import SocketService from './services/socketService';
@@ -16,6 +17,7 @@ import proveedoresRoutes from './routes/proveedores.routes';
 import inventoryRoutes from './routes/inventory.routes';
 import inventoryOrdersRoutes from './routes/inventoryOrders.routes';
 import credentialsRoutes from './routes/credentials.routes';
+import invitationsRoutes from './routes/invitations.routes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -23,6 +25,10 @@ const server = http.createServer(app);
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Para parsear FormData
+
+// Servir archivos estáticos de facturas
+app.use('/api/uploads/invoices', express.static(path.join(__dirname, '../uploads/invoices')));
 
 // Rutas
 app.use('/api', spotifyRoutes);
@@ -36,6 +42,7 @@ app.use('/api', proveedoresRoutes);
 app.use('/api', inventoryRoutes);
 app.use('/api', inventoryOrdersRoutes);
 app.use('/api', credentialsRoutes);
+app.use('/api', invitationsRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
