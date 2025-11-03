@@ -52,38 +52,35 @@ export const listInventoryOrders = async (req: Request, res: Response) => {
     
     const invoicesDir = path.join(__dirname, '../../uploads/invoices');
     
-    // Normalizar y validar facturas
+    // Normalizar y validar facturas (limpieza en bloque para evitar logs repetidos)
+    const idsToUnset: string[] = [];
     const normalizedOrders = orders.map((order: any) => {
-      const orderObj = order.toObject();
-      
-      // Migración: si tiene facturasPdf (array antiguo), tomar el primero
-      if (orderObj.facturasPdf && Array.isArray(orderObj.facturasPdf) && orderObj.facturasPdf.length > 0) {
-        orderObj.facturaPdf = orderObj.facturasPdf[0];
-        // Actualizar BD asíncronamente
-        InventoryOrder.findByIdAndUpdate(orderObj._id, { facturaPdf: orderObj.facturaPdf }, { new: true })
-          .catch(err => console.error(`❌ Error migrando factura del pedido ${orderObj._id}:`, err));
+      const o = order.toObject();
+
+      if (o.facturasPdf && Array.isArray(o.facturasPdf) && o.facturasPdf.length > 0) {
+        o.facturaPdf = o.facturasPdf[0];
+        InventoryOrder.findByIdAndUpdate(o._id, { facturaPdf: o.facturaPdf }).catch(() => {});
       }
-      
-      // Asegurar que facturaPdf es un string
-      if (!orderObj.facturaPdf || typeof orderObj.facturaPdf !== 'string') {
-        orderObj.facturaPdf = '';
+
+      if (!o.facturaPdf || typeof o.facturaPdf !== 'string') {
+        o.facturaPdf = '';
       }
-      
-      // Validar que la factura existe físicamente
-      if (orderObj.facturaPdf && orderObj.facturaPdf.trim() !== '') {
-        const filePath = path.join(invoicesDir, orderObj.facturaPdf);
+
+      if (o.facturaPdf.trim() !== '') {
+        const filePath = path.join(invoicesDir, o.facturaPdf);
         if (!fs.existsSync(filePath)) {
-          // Solo limpiar la referencia si no existe, SIN buscar archivos similares
-          console.log(`⚠️ Factura no encontrada físicamente: ${orderObj.facturaPdf} (Pedido ID: ${orderObj._id})`);
-          orderObj.facturaPdf = '';
-          InventoryOrder.findByIdAndUpdate(orderObj._id, { facturaPdf: '' }, { new: true })
-            .catch(err => console.error(`❌ Error limpiando factura del pedido ${orderObj._id}:`, err));
+          idsToUnset.push(String(o._id));
+          o.facturaPdf = '';
         }
       }
-      
-      return orderObj;
+
+      return o;
     });
-    
+
+    if (idsToUnset.length > 0) {
+      await InventoryOrder.updateMany({ _id: { $in: idsToUnset } }, { $set: { facturaPdf: '' } });
+    }
+
     res.json(normalizedOrders);
   } catch (error) {
     console.error('❌ Error listando pedidos:', error);
@@ -102,38 +99,9 @@ export const updateInventoryOrder = async (req: Request, res: Response) => {
       // Si hay una factura anterior, eliminarla físicamente
       if (existingOrder && existingOrder.facturaPdf) {
         const invoicesDir = path.join(__dirname, '../../uploads/invoices');
-        let oldFilePath = path.join(invoicesDir, existingOrder.facturaPdf);
-        
-        if (!fs.existsSync(oldFilePath)) {
-          // Intentar encontrar un archivo similar
-          const dbFilename = existingOrder.facturaPdf;
-          try {
-            const files = fs.readdirSync(invoicesDir);
-            const baseNameMatch = dbFilename.match(/^(.+?)-(\d+)/);
-            if (baseNameMatch) {
-              const baseName = baseNameMatch[1];
-              const firstTimestamp = baseNameMatch[2];
-              const foundFile = files.find((f: string) => {
-                const fileBaseMatch = f.match(/^(.+?)-(\d+)/);
-                if (fileBaseMatch && fileBaseMatch[1] === baseName && fileBaseMatch[2] === firstTimestamp) {
-                  return true;
-                }
-                return false;
-              });
-              
-              if (foundFile) {
-                console.log(`✅ Archivo similar encontrado para actualización: ${dbFilename} -> ${foundFile} (Pedido ID: ${id})`);
-                oldFilePath = path.join(invoicesDir, foundFile);
-              }
-            }
-          } catch (dirErr) {
-            console.error(`❌ Error leyendo directorio de facturas:`, dirErr);
-          }
-        }
-        
+        const oldFilePath = path.join(invoicesDir, existingOrder.facturaPdf);
         if (fs.existsSync(oldFilePath)) {
           fs.unlinkSync(oldFilePath);
-          console.log('✅ Factura anterior eliminada:', path.basename(oldFilePath));
         }
       }
       // Guardar la nueva factura
