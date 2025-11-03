@@ -1,10 +1,6 @@
 export const config = {
     port: 3000,
     mongoUrl: "mongodb+srv://developjuansebastian_db_user:AjRlHPRSQrM01mpA@proyectomongodb.ycpota1.mongodb.net/Proyecto?appName=ProyectoMongodb",
-    spotify: {
-        clientId: 'f9cbe7c6fa1140b0b53b63c7f2fc817a',
-        clientSecret: '799cf82089044af7bfb68e6bcfaa2e72'
-    },
     cors: {
         origin: "*",
         methods: ["GET", "POST"]

@@ -4,9 +4,7 @@ import http from "http";
 import cors from "cors";
 import path from "path";
 import { config } from './config/config';
-import spotifyRoutes from './routes/spotifyRoutes';
 import SocketService from './services/socketService';
-import { spotifyService } from './services/spotifyService';
 import eventRoutes from './routes/eventRoutes';
 import stripeRoutes from './routes/stripe.routes';
 import openaiRoutes from './routes/openaiRoutes';
@@ -31,7 +29,6 @@ app.use(express.urlencoded({ extended: true })); // Para parsear FormData
 app.use('/api/uploads/invoices', express.static(path.join(__dirname, '../uploads/invoices')));
 
 // Rutas
-app.use('/api', spotifyRoutes);
 app.use('/api', eventRoutes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/api/openai', openaiRoutes);
@@ -66,7 +63,6 @@ const socketService = new SocketService(server);
 // Iniciar el servidor
 const startServer = async () => {
     await connectDB();
-    await spotifyService.getToken(); // Obtener token de Spotify al inicio
 
     server.listen(config.port, () => {
         console.log(`✅ Servidor escuchando en http://localhost:${config.port}`);
