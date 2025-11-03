@@ -27,6 +27,7 @@ export const createProject = async (req: Request, res: Response) => {
       'inventory',
       'suppliers',
       'customers',
+      'orders',
       'invoices',
       'statistics'
     ];
