@@ -69,7 +69,7 @@ export const getProjectById = async (req: Request, res: Response) => {
       res.status(400).json({ error: 'projectId es requerido' });
       return;
     }
-    const proj = await ProjectModel.findById(projectId);
+    const proj = await ProjectModel.findById(projectId).lean();
     if (!proj) {
       res.status(404).json({ error: 'Proyecto no encontrado' });
       return;

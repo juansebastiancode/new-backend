@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Usuario from '../models/usuariosModel';
+import Invitation from '../models/invitation.model';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -44,15 +45,38 @@ export const getUserByEmail = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     const user = await Usuario.findOne({ email, eliminado: false })
-      .populate('proyectos', 'name sector createdAt')
-      .populate('proyectosInvitados', 'name sector createdAt');
+      .populate('proyectos', 'name sector createdAt userId enabledTabs')
+      .populate('proyectosInvitados', 'name sector createdAt userId enabledTabs');
     
     if (!user) {
       res.status(404).json({ error: 'Usuario no encontrado' });
       return;
     }
     
-    res.json({ user });
+    // Enriquecer proyectosInvitados con allowedTabs desde las invitaciones
+    const userObj: any = user.toObject();
+    if (userObj.proyectosInvitados && userObj.proyectosInvitados.length > 0) {
+      const enrichedProjects = await Promise.all(
+        userObj.proyectosInvitados.map(async (project: any) => {
+          const invitation = await Invitation.findOne({
+            projectId: project._id,
+            inviteeEmail: email,
+            status: 'accepted'
+          });
+          
+          if (invitation && invitation.allowedTabs) {
+            project.allowedTabs = invitation.allowedTabs;
+          } else {
+            project.allowedTabs = [];
+          }
+          
+          return project;
+        })
+      );
+      userObj.proyectosInvitados = enrichedProjects;
+    }
+    
+    res.json({ user: userObj });
   } catch (error: any) {
     console.error('❌ Error al buscar usuario:', error);
     res.status(500).json({ error: 'Error interno del servidor' });

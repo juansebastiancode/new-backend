@@ -193,7 +193,10 @@ export const getProjectMembers = async (req: Request, res: Response) => {
       const creator = await Usuario.findById(project.userId)
         .select('nombre email instagram telefono pais ciudad');
       if (creator) {
-        members.push(creator);
+        const creatorObj: any = creator.toObject();
+        creatorObj.isOwner = true;
+        creatorObj.allowedTabs = []; // El propietario tiene acceso a todos
+        members.push(creatorObj);
       }
     }
 
@@ -203,8 +206,19 @@ export const getProjectMembers = async (req: Request, res: Response) => {
       eliminado: false
     }).select('nombre email instagram telefono pais ciudad');
 
-    // Agregar los invitados después del creador
-    members.push(...invitedMembers);
+    // Obtener permisos de cada miembro invitado
+    for (const member of invitedMembers) {
+      const invitation = await Invitation.findOne({
+        projectId,
+        inviteeEmail: member.email,
+        status: 'accepted'
+      });
+      
+      const memberObj: any = member.toObject();
+      memberObj.isOwner = false;
+      memberObj.allowedTabs = invitation?.allowedTabs || [];
+      members.push(memberObj);
+    }
 
     res.status(200).json(members);
   } catch (error) {
@@ -235,6 +249,39 @@ export const leaveProject = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Proyecto abandonado exitosamente' });
   } catch (error) {
     console.error('❌ Error abandonando proyecto:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+export const updateMemberPermissions = async (req: Request, res: Response) => {
+  try {
+    const { projectId, inviteeEmail } = req.body;
+    const { allowedTabs } = req.body;
+
+    if (!projectId || !inviteeEmail) {
+      res.status(400).json({ error: 'projectId y inviteeEmail requeridos' });
+      return;
+    }
+
+    // Buscar la invitación aceptada para este usuario y proyecto
+    const invitation = await Invitation.findOne({
+      projectId,
+      inviteeEmail,
+      status: 'accepted'
+    });
+
+    if (!invitation) {
+      res.status(404).json({ error: 'Invitación aceptada no encontrada para este usuario' });
+      return;
+    }
+
+    // Actualizar los permisos
+    invitation.allowedTabs = allowedTabs || [];
+    await invitation.save();
+
+    res.status(200).json({ message: 'Permisos actualizados exitosamente', invitation });
+  } catch (error) {
+    console.error('❌ Error actualizando permisos:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };

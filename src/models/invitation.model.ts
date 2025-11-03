@@ -10,6 +10,7 @@ const invitationSchema = new mongoose.Schema({
     default: 'pending',
     index: true 
   },
+  allowedTabs: { type: [String], default: [] }, // Tabs a los que el usuario invitado tiene acceso
   createdAt: { type: Date, default: Date.now },
   respondedAt: { type: Date } // Fecha cuando aceptó o rechazó
 });

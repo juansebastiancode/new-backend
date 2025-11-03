@@ -6,7 +6,8 @@ import {
   acceptInvitation,
   rejectInvitation,
   getProjectMembers,
-  leaveProject
+  leaveProject,
+  updateMemberPermissions
 } from '../controllers/invitations.controller';
 
 const router = Router();
@@ -18,6 +19,7 @@ router.post('/invitations/:id/accept', acceptInvitation);
 router.post('/invitations/:id/reject', rejectInvitation);
 router.get('/invitations/members', getProjectMembers);
 router.post('/invitations/leave-project', leaveProject);
+router.put('/invitations/permissions', updateMemberPermissions);
 
 export default router;
 
