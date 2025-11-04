@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
+    "build": "node ./node_modules/typescript/bin/tsc -p tsconfig.json",
+    "start": "node ./dist/server.js",
     "dev": "ts-node --transpile-only src/server.ts",
-    "postinstall": "npm run build"
+    "postinstall": "node ./node_modules/typescript/bin/tsc -p tsconfig.json"
   },
   "keywords": [],
   "author": "",
