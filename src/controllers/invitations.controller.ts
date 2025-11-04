@@ -286,3 +286,49 @@ export const updateMemberPermissions = async (req: Request, res: Response) => {
   }
 };
 
+export const removeMember = async (req: Request, res: Response) => {
+  try {
+    const { projectId, email } = req.body;
+
+    if (!projectId || !email) {
+      res.status(400).json({ error: 'projectId y email requeridos' });
+      return;
+    }
+
+    const user = await Usuario.findOne({ email });
+    if (!user) {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+      return;
+    }
+
+    // Verificar que el usuario esté en proyectosInvitados
+    if (!user.proyectosInvitados || !user.proyectosInvitados.some((id: any) => id.toString() === projectId)) {
+      res.status(400).json({ error: 'Este usuario no es miembro del proyecto' });
+      return;
+    }
+
+    // Remover el proyecto de proyectosInvitados
+    user.proyectosInvitados = user.proyectosInvitados.filter((id: any) => id.toString() !== projectId);
+    await user.save();
+
+    // Actualizar la invitación a rechazada (opcional, para mantener historial)
+    const invitation = await Invitation.findOne({
+      projectId,
+      inviteeEmail: email,
+      status: 'accepted'
+    });
+    
+    if (invitation) {
+      invitation.status = 'rejected';
+      invitation.respondedAt = new Date();
+      await invitation.save();
+    }
+
+    console.log('✅ Miembro expulsado del proyecto:', email);
+    res.status(200).json({ message: 'Miembro expulsado exitosamente' });
+  } catch (error) {
+    console.error('❌ Error expulsando miembro:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+

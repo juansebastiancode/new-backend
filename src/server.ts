@@ -14,6 +14,7 @@ import customersRoutes from './routes/customers.routes';
 import proveedoresRoutes from './routes/proveedores.routes';
 import inventoryRoutes from './routes/inventory.routes';
 import inventoryOrdersRoutes from './routes/inventoryOrders.routes';
+import customerOrdersRoutes from './routes/customerOrders.routes';
 import credentialsRoutes from './routes/credentials.routes';
 import invitationsRoutes from './routes/invitations.routes';
 
@@ -38,6 +39,7 @@ app.use('/api', customersRoutes);
 app.use('/api', proveedoresRoutes);
 app.use('/api', inventoryRoutes);
 app.use('/api', inventoryOrdersRoutes);
+app.use('/api', customerOrdersRoutes);
 app.use('/api', credentialsRoutes);
 app.use('/api', invitationsRoutes);
 
