@@ -10,3 +10,4 @@ const AssistantSample = mongoose.model('AssistantSample', assistantSampleSchema)
 export default AssistantSample;
 
 
+

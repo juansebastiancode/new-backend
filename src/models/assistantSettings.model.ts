@@ -16,3 +16,4 @@ const AssistantSettings = mongoose.model<IAssistantSettings>('AssistantSettings'
 export default AssistantSettings;
 
 
+

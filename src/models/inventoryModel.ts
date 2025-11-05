@@ -22,3 +22,4 @@ const InventoryItem = mongoose.model('InventoryItem', inventoryItemSchema);
 
 export default InventoryItem;
 
+
