@@ -65,4 +65,3 @@ export const deleteProveedor = async (req: Request, res: Response) => {
 };
 
 
-

@@ -19,4 +19,3 @@ router.get('/credentials/:id/password', getCredentialPassword);
 
 export default router;
 
-

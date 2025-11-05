@@ -11,4 +11,3 @@ router.delete('/suppliers/:id', deleteProveedor);
 export default router;
 
 
-

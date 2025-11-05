@@ -13,4 +13,3 @@ router.delete('/customer-orders/:id/invoice', deleteInvoice);
 
 export default router;
 
-

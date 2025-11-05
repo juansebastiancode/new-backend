@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import express, { Application } from "express";
 import mongoose from "mongoose";
 import http from "http";
@@ -20,7 +17,6 @@ import inventoryOrdersRoutes from './routes/inventoryOrders.routes';
 import customerOrdersRoutes from './routes/customerOrders.routes';
 import credentialsRoutes from './routes/credentials.routes';
 import invitationsRoutes from './routes/invitations.routes';
-import assistantRoutes from './routes/assistant.routes';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -32,8 +28,6 @@ app.use(express.urlencoded({ extended: true })); // Para parsear FormData
 
 // Servir archivos estáticos de facturas
 app.use('/api/uploads/invoices', express.static(path.join(__dirname, '../uploads/invoices')));
-// Servir archivos estáticos de audio
-app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Rutas
 app.use('/api', eventRoutes);
@@ -48,7 +42,6 @@ app.use('/api', inventoryOrdersRoutes);
 app.use('/api', customerOrdersRoutes);
 app.use('/api', credentialsRoutes);
 app.use('/api', invitationsRoutes);
-app.use('/api', assistantRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {

@@ -10,4 +10,3 @@ router.delete('/inventory/:id', deleteInventoryItem);
 
 export default router;
 
-
